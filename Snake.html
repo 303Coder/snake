@@ -1,0 +1,221 @@
+<html>
+    <head>
+        <canvas id="gc" ></canvas>
+    </head>
+
+
+    <body>
+        <script>
+            var c = document.getElementById('gc');
+            var cc = c.getContext('2d');
+            c.width = 800;
+            c.height = 800;
+            var stop = false;
+
+            var bodySize = 25;
+
+
+            var headx = 100;
+            var heady = 100;
+
+            var left,up,right,down = false;
+
+            var body = [];
+            var tailLength = 1;
+
+
+
+
+            var foodx;
+            var foody;
+
+            var color = 'lime';
+
+
+            var FPS = 15;
+
+            var z = 'black';
+
+
+
+            window.onload = function() {
+                canvas();
+
+                pickNewFood();
+                food();
+
+                setInterval(loop, 1000/FPS);
+
+                document.addEventListener('keydown', function(evt) {
+                    if(evt.keyCode === 37 && right == false) {
+                        left = true;
+                        up = false;
+                        right = false;
+                        down = false;
+                        console.log("Left");
+                    } 
+                    if(evt.keyCode === 38 && down == false) {
+                        left = false;
+                        up = true;
+                        right = false;
+                        down = false;
+                        console.log("Up");
+                    } 
+                    if(evt.keyCode === 39 && left == false) {
+                        left = false;
+                        up = false;
+                        right = true;
+                        down = false;
+                        console.log("Right");
+                    } 
+                    if(evt.keyCode === 40 && up == false) {
+                        left = false;
+                        up = false;
+                        right = false;
+                        down = true;
+                        console.log("Down");
+                    }
+
+
+                    if(evt.keyCode === 32) {
+                        stop = !stop;
+                    }
+                });
+            }
+
+
+
+            function loop() {
+                if(stop) return;
+
+
+
+                canvas();
+
+                
+                for(var i=0; i<body.length; i++) {
+                    body[i].draw();
+                    for(var j =i+1; j<body.length; j++) {
+                        if(body[i].x == body[j].x && body[i].y == body[j].y) {
+                            z = 'green';
+                        } else {
+                            z = 'black';
+                        }
+                    }
+                } 
+                
+
+
+                let x = new snake(headx, heady);
+                body.push(x);
+                while(body.length > tailLength) {
+                    body.shift();
+                }
+                
+                food();
+
+
+
+                if(left) {
+                    headx -= bodySize;
+                }
+
+                if(up) {
+                    heady -= bodySize;
+                }
+
+                if(right) {
+                    headx += bodySize;
+                }
+
+                if(down) {
+                    heady += bodySize;
+                }
+
+
+                if(headx == foodx && heady === foody) {
+                    pickNewFood();
+                    tailLength++;
+
+                }
+
+
+                if(headx > c.width) {
+                    headx=0;
+                }
+                if(headx<0) {
+                    headx = c.width;
+                }
+                if(heady > c.height) {
+                    heady = 0;
+                }
+                if(heady < 0) {
+                    heady = c.height;
+                }
+
+    
+               if(tailLength % 5 == 0) {
+                let x = Math.floor(Math.random() * 255);
+                let y = Math.floor(Math.random() * 255);
+                let z = Math.floor(Math.random() * 255);
+                let a = "rgb("+x+","+y+","+z+")";
+                color = a;
+               }
+
+               if(tailLength > 40) {
+                bodySize = 25; 
+                FPS = 40;
+               }
+
+            }
+
+
+
+            function canvas() {
+                cc.fillStyle = z;
+                cc.fillRect(0, 0, c.width, c.height);
+            }
+
+
+
+            function food() {
+                cc.fillStyle = 'red';
+                cc.fillRect(foodx, foody, bodySize, bodySize);
+            }
+
+
+            function pickNewFood() {
+                    let x = Math.floor(Math.random() * c.width/bodySize);
+                    let y = Math.floor(Math.random() * c.height/bodySize);
+                    let gridx = c.width/bodySize;
+                    let gridy = c.height/bodySize;
+
+                    foodx = bodySize * x;
+                    foody = bodySize * y;
+
+                    console.log("Random", x, y);
+                    console.log(gridx, gridy);
+                    console.log(foodx, foody);
+            }
+
+         class snake {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            draw() {
+                cc.fillStyle = color;
+                cc.fillRect(this.x, this.y, bodySize, bodySize);
+            }
+
+            update(a, b) {
+                this.x = a;
+                this.y = b;
+            }
+
+
+         }
+        </script>
+    </body>
+</html>
